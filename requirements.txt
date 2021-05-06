@@ -41,7 +41,6 @@ service-identity==18.1.0
 six==1.15.0
 sqlparse==0.4.1
 toml==0.10.2
-Twisted @ file:///C:/Users/BOB.T/Downloads/Twisted-20.3.0-cp39-cp39-win_amd64.whl
 txaio==20.12.1
 urllib3==1.26.2
 whitenoise==5.2.0
