@@ -1,0 +1,295 @@
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1 shrink-to-fit=no">
+
+</head>
+
+<style>
+	:root {
+  --body-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --msger-bg: #fff;
+  --border: 2px solid #ddd;
+  --left-msg-bg: #ececec;
+  --right-msg-bg: #5da2fc;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: var(--body-bg);
+  font-family: Helvetica, sans-serif;
+}
+
+.msger {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 800px;
+  margin: 25px 10px;
+  height: calc(100% - 50px);
+  border: var(--border);
+  border-radius: 5px;
+  background: var(--msger-bg);
+  box-shadow: 0 15px 15px -5px rgba(0, 0, 0, 0.2);
+}
+
+.msger-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: var(--border);
+  background: #eee;
+  color: rgb(111, 115, 138);
+}
+
+.msger-chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+.msger-chat::-webkit-scrollbar {
+  width: 6px;
+}
+.msger-chat::-webkit-scrollbar-track {
+  background: #ddd;
+}
+.msger-chat::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+}
+.msg {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+.msg:last-of-type {
+  margin: 0;
+}
+
+
+.left-msg .msg-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.left-msg .msg-info-name {
+  margin-right: 10px;
+  font-weight: bold;
+  color:mediumblue;
+
+}
+.left-msg .msg-info-time {
+  font-size: 0.7em;
+  padding:1%;
+  color: #04975a;
+
+}
+
+.left-msg{
+
+  clear:both;
+  max-width: fit-content;
+  padding: 15px;
+  border-radius: 15px;
+  background: var(--left-msg-bg);	
+  border-bottom-left-radius: 0;
+  margin-bottom:10px;
+  
+}
+
+
+
+
+.msger-inputarea {
+  display: flex;
+  padding: 10px;
+  border-top: var(--border);
+  background: #eee;
+}
+.msger-inputarea * {
+  padding: 10px;
+  border: none;
+  border-radius: 3px;
+  font-size: 1em;
+}
+.msger-input {
+  flex: 1;
+  background: #ddd;
+}
+.msger-send-btn {
+  margin-left: 10px;
+  background: rgb(0, 196, 65);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.23s;
+}
+.msger-send-btn:hover {
+  background: rgb(0, 180, 50);
+}
+
+.msger-chat {
+  background-color: #fcfcfe;
+}
+h4{color: crimson;}
+
+.leave{
+  font-size: 18px;
+  text-decoration: none;
+  color: crimson;
+}
+
+#download{
+  text-decoration: none;
+  color:#5da2fc;
+  padding: 5px;
+}
+
+</style>
+
+
+<section class="msger">
+  <h4 id ='alert'></h4>
+  <header class="msger-header">
+    <div class="msger-header-title" style="font-size: 22px;">
+      Only-text
+    </div>
+    
+    <div class="msger-header-options">
+      <a href='{% url "join_room" %}' class='leave'>leave</a>
+    </div>
+  </header>
+
+
+  <main class="msger-chat"id='msger-chat'>
+    <div class="left-msg">
+      <div class="msg-info-name">App</div>
+	
+    
+         <div class="msg-info-time"></div>
+
+
+        <div class="msg-text" >
+          Welcome to {{room_name}} 🙋‍♂️‍.
+        </div>
+    </div>
+   
+  </main>
+
+  <div class="msger-inputarea">
+    <input type="text" class="msger-input" id = "msger-input" placeholder="Enter your message...">
+    <button type='button' class="msger-send-btn"  id="msger-send-btn" onclick= 'send_data()'>Send</button>
+  </div>
+  
+</section>
+
+
+<script>
+
+//initialising the websocket connection to server
+	var socket = new WebSocket('ws://'+window.location.host+'/'+'chatpage/'+'{{room_name}}/'+'{{username}}')
+
+
+//Cheking if enter button is pressed.
+	document.querySelector('#msger-input').onkeypress = function(event){
+		if (event.keyCode === 13){
+			document.querySelector('#msger-send-btn').click()
+			
+		}
+	}
+
+  
+//function after send button is clicked
+	function send_data(){
+	//Making sure entery is not empty
+		if (document.querySelector('#msger-input').value == ''){
+				{}
+		}
+		else{
+      //sending a ws message to server
+			text = document.querySelector('#msger-input').value
+			json = JSON.stringify({'message':text})
+			socket.send(json)
+			document.querySelector('#msger-input').value = ''
+		}
+  }
+
+		socket.onmessage=function( event){
+      parsed = JSON.parse(event.data)
+      let New = document.querySelector('.left-msg').cloneNode(true)
+      main = document.querySelector('#msger-chat')
+      main.append(New)
+      text_div = New.childNodes[5]
+      time = New.childNodes[3]
+      New.childNodes[1].style.color = 'indianRed'
+      
+      if (parsed.download_link){
+        iframe()
+        Down_link()
+      }
+      else{
+          new_data()
+      }
+
+      main.scrollTop = main.scrollHeight;
+    //cloning first bubble
+      function new_data(){ 
+        New.childNodes[1].textContent = parsed.username
+        text_div.textContent = parsed.message
+        time.textContent = parsed.time
+        
+      }
+        
+      
+      function iframe(){
+          New.childNodes[5].textContent = ''
+          New.childNodes[1].textContent = parsed.username
+          New.childNodes[1].style.color = 'chocolate'
+          element = document.createElement('iframe')
+          element.setAttribute('src','https://www.youtube.com/embed/'+ parsed.id )
+          element.setAttribute('height','150')
+          element.setAttribute('width','250')
+          element.setAttribute('frameborder','0')
+        
+          
+          return New.appendChild(element)
+      }
+
+      function Down_link(){
+        elem = document.createElement('a')
+        elem.setAttribute('href',parsed.download_link)
+        elem.setAttribute('id','download')
+        elem.innerText = 'Download audio'
+
+        return '/n' + New.appendChild(elem)
+
+      }
+    
+
+  }
+  
+    //when ws closes
+		socket.onclose = function(event){
+      setTimeout("location.reload(true);", 5000)
+
+    }
+    
+    
+
+    
+		
+</script>
