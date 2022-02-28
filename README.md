@@ -9,4 +9,10 @@ A live demo can be seen here [Only-text](https://only-text.herokuapp.com,'')
 * Voice note recording
 * Youtube search and download api
 
-## Installation and requirements
+## Setup and and requirements
+* Clone project: git clone https://github.com/logic-OT/countries
+* Create virtual environment: virtualenv myenv
+* myenv\scripts\activate
+* pip install -r requirements.txt
+* python manage.py runserver
+* Internet connection needed for youtube api to work
